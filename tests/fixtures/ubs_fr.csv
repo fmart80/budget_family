@@ -1,0 +1,16 @@
+Numéro de compte:;0235 00123456.01;
+IBAN:;CH12 0023 5235 1234 5601 R;
+Du:;2026-09-01;
+Au:;2026-09-30;
+Solde d'ouverture:;5000.00;
+Solde de clôture:;9000.00;
+Évalué en:;CHF;
+Nombre de transactions dans cette période:;5;
+
+Date de transaction;Heure de transaction;Date de comptabilisation;Date de valeur;Monnaie;Débit;Crédit;Sous-montant;Solde;N° de transaction;Description1;Description2;Description3;Notes de bas de page;
+2026-09-28;14:22:01;2026-09-28;2026-09-28;CHF;-85.40;;;4914.60;9930;Coop-1234 Fribourg;Achat carte de débit;"Carte n° XXXX";;
+2026-09-25;;2026-09-25;2026-09-25;CHF;;6500.00;;11414.60;9931;Employeur SA;Salaire septembre;;;
+2026-09-20;;2026-09-20;2026-09-20;CHF;-1'280.40;;;10134.20;9932;Ordre groupé e-banking;;;;
+2026-09-20;;;;CHF;;;-980.40;;;CSS Assurance;Prime LAMal;;;
+2026-09-20;;;;CHF;;;-300.00;;;Groupe E;Électricité;;;
+2026-09-15;;2026-09-15;2026-09-15;CHF;-85.40;;;10048.80;9933;Coop-1234 Fribourg;Achat carte de débit;"Carte n° XXXX";;
