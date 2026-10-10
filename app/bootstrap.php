@@ -28,10 +28,16 @@ date_default_timezone_set($GLOBALS['config']['timezone'] ?? 'Europe/Zurich');
 
 $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
     || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+// Cookie limité au dossier de l'application (ex. /budget/) pour ne pas interférer avec le reste du site.
+$cookiePath = $GLOBALS['config']['cookie_path'] ?? null;
+if (!$cookiePath) {
+    $uriPath = (string) parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+    $cookiePath = rtrim(str_ends_with($uriPath, '/') ? $uriPath : dirname($uriPath), '/\\') . '/';
+}
 session_name('budget_sid');
 session_set_cookie_params([
     'lifetime' => 0,
-    'path'     => '/',
+    'path'     => $cookiePath,
     'secure'   => $secure,
     'httponly' => true,
     'samesite' => 'Lax',

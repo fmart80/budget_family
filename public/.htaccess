@@ -5,7 +5,4 @@ DirectoryIndex index.php
     Header always set X-Content-Type-Options "nosniff"
 </IfModule>
 
-# Forcer HTTPS (décommentez après avoir activé le certificat SSL dans Plesk)
-# RewriteEngine On
-# RewriteCond %{HTTPS} !=on
-# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# HTTPS : voir le .htaccess à la racine du projet.

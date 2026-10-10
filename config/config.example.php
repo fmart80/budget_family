@@ -19,6 +19,10 @@ return [
     // Taille maximale des pièces jointes (factures), en octets.
     'max_upload_size' => 10 * 1024 * 1024,
 
+    // Chemin du cookie de session. Laisser null : il est déduit automatiquement de l'adresse
+    // (ex. « /budget/ » si l'application est installée dans https://votre-domaine.ch/budget/).
+    'cookie_path' => null,
+
     // Mettre à true uniquement pour diagnostiquer un problème (affiche les erreurs PHP).
     'debug' => false,
 ];

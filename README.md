@@ -28,22 +28,29 @@ Dans Plesk, ouvrez **Bases de données → Ajouter une base de données**. Chois
 Dans **Sites Web & Domaines → Paramètres PHP**, sélectionnez **PHP 8.2**. Les extensions `pdo_mysql`, `mbstring` et `dom` sont nécessaires et normalement actives. `zip` est facultative et sert seulement à importer un relevé camt en ZIP.
 
 ### 3. Envoi des fichiers (SFTP)
-Envoyez **tout le contenu du dépôt** dans le dossier du site, par exemple `/httpdocs/` :
+L'application s'installe dans un sous-dossier, par exemple `https://votre-domaine.ch/budget/`. Créez le dossier `/httpdocs/budget/` et envoyez-y **tout le contenu du dépôt**, y compris les fichiers cachés `.htaccess` :
 
 ```
 httpdocs/
-├── app/          ← code (accès web bloqué)
-├── config/       ← configuration (accès web bloqué)
-├── database/     ← schéma SQL (accès web bloqué)
-├── public/       ← seule partie publique
-├── storage/      ← pièces jointes (accès web bloqué)
-└── index.php
+├── (votre site actuel, inchangé)
+└── budget/
+    ├── .htaccess     ← redirige les requêtes vers public/ (important)
+    ├── app/          ← code (accès web bloqué)
+    ├── config/       ← configuration (accès web bloqué)
+    ├── database/     ← schéma SQL (accès web bloqué)
+    ├── public/       ← seule partie publique
+    ├── storage/      ← pièces jointes (accès web bloqué)
+    └── index.php
 ```
 
-### 4. Racine du site (important)
-Dans **Sites Web & Domaines → Paramètres d'hébergement**, réglez la **racine des documents** sur `httpdocs/public`. Les fichiers de configuration et les factures jointes ne sont alors jamais accessibles depuis le web.
+> Vérifiez que votre client SFTP affiche et envoie les fichiers cachés (FileZilla : *Serveur → Forcer l'affichage des fichiers cachés*).
 
-> Si vous ne pouvez pas modifier ce réglage, l'application fonctionne quand même : `index.php` redirige vers `public/`, et chaque dossier sensible contient un `.htaccess` qui en interdit l'accès.
+### 4. Accès à l'application
+Aucun réglage de Plesk n'est nécessaire : le fichier `budget/.htaccess` sert automatiquement le contenu de `public/`. L'application répond à `https://votre-domaine.ch/budget/` et tout le reste (`config/`, `app/`, `storage/`…) est inaccessible depuis le web.
+
+- Le cookie de session est limité à `/budget/` : il n'interfère pas avec le reste du site.
+- Si les pages s'affichent sans mise en forme ou renvoient une erreur 404, décommentez la ligne `RewriteBase /budget/` dans `budget/.htaccess`.
+- Si `.htaccess` n'est pas pris en compte (serveur nginx seul), le fichier `budget/index.php` redirige vers `budget/public/` : l'application fonctionne alors à l'adresse `/budget/public/`.
 
 ### 5. Configuration
 Dans le **Gestionnaire de fichiers** de Plesk, copiez `config/config.example.php` en `config/config.php`, puis renseignez :
@@ -51,10 +58,10 @@ Dans le **Gestionnaire de fichiers** de Plesk, copiez `config/config.example.php
 - `setup_key` : une phrase secrète longue, demandée une seule fois pendant l'installation.
 
 ### 6. Installation
-Ouvrez votre site dans le navigateur. Saisissez la `setup_key`, cliquez sur **Installer la base de données**, puis créez votre compte administrateur.
+Ouvrez `https://votre-domaine.ch/budget/` dans le navigateur. Saisissez la `setup_key`, cliquez sur **Installer la base de données**, puis créez votre compte administrateur.
 
 ### 7. HTTPS
-Activez un certificat **Let's Encrypt** gratuit dans Plesk (**SSL/TLS**). Décommentez ensuite les lignes de redirection HTTPS dans `public/.htaccess`.
+Activez un certificat **Let's Encrypt** gratuit dans Plesk (**SSL/TLS**). Décommentez ensuite les deux lignes « Forcer HTTPS » dans `budget/.htaccess`.
 
 ### 8. Dossier des pièces jointes
 `storage/uploads/` doit être accessible en écriture par PHP. C'est le cas par défaut sur Plesk. En cas d'erreur à l'envoi d'une facture, donnez les droits `755` à ce dossier.
