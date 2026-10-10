@@ -35,3 +35,11 @@ document.querySelectorAll('canvas[data-chart]').forEach((canvas) => {
     cfg.options = Object.assign({ responsive: true, maintainAspectRatio: false }, cfg.options || {});
     new Chart(canvas, cfg);
 });
+
+// Boutons de présélection des mois (postes prévus)
+document.querySelectorAll('[data-months]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+        const set = btn.dataset.months.split(',').filter(Boolean);
+        document.querySelectorAll('.month-check').forEach((cb) => { cb.checked = set.includes(cb.value); });
+    });
+});

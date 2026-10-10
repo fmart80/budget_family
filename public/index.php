@@ -32,6 +32,7 @@ if (!Database::isInstalled() || !$setup->hasUsers()) {
     $setup->run();
     exit;
 }
+Database::migrate();
 
 $routes = [
     'login'                => ['AuthController', 'login'],
@@ -68,6 +69,20 @@ $routes = [
     'budgets'              => ['BudgetsController', 'index'],
     'budgets/save'         => ['BudgetsController', 'save'],
     'budgets/copy'         => ['BudgetsController', 'copy'],
+
+    'planned'              => ['PlannedController', 'index'],
+    'planned/edit'         => ['PlannedController', 'edit'],
+    'planned/save'         => ['PlannedController', 'save'],
+    'planned/delete'       => ['PlannedController', 'delete'],
+    'planned/import_bills' => ['PlannedController', 'importBills'],
+
+    'forecast'             => ['ForecastController', 'index'],
+    'forecast/smoothing'   => ['ForecastController', 'smoothing'],
+    'forecast/analysis'    => ['ForecastController', 'analysis'],
+    'forecast/budget_from_average' => ['ForecastController', 'budgetFromAverage'],
+    'forecast/plan_from_average'   => ['ForecastController', 'planFromAverage'],
+
+    'guide'                => ['GuideController', 'index'],
 
     'bills'                => ['BillsController', 'index'],
     'bills/edit'           => ['BillsController', 'edit'],

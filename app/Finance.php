@@ -113,24 +113,52 @@ final class Finance
         return (int) ceil(-log(1 - $r * $balance / $payment) / log(1 + $r));
     }
 
-    /** Échéancier prévisionnel (mois, intérêts, capital, solde). */
-    public static function amortization(float $balance, float $annualRate, float $payment, int $maxRows = 600): array
+    /**
+     * Échéancier prévisionnel (mois, versement, intérêts, capital, solde).
+     * $extras : versements supplémentaires par numéro de mois, ex. [6 => 1000, 12 => 1000] (13e salaire).
+     */
+    public static function amortization(float $balance, float $annualRate, float $payment, int $maxRows = 600, array $extras = []): array
     {
         $rows = [];
         $r = $annualRate / 100 / 12;
         $date = strtotime(date('Y-m-01'));
-        for ($i = 1; $balance > 0.005 && $i <= $maxRows && $payment > 0; $i++) {
+        for ($i = 1; $balance > 0.005 && $i <= $maxRows && ($payment > 0 || $extras); $i++) {
+            $ts = strtotime("+$i months", $date);
             $interest = round($balance * $r, 2);
-            $pay = min($payment, $balance + $interest);
-            if ($pay <= $interest) {
+            $extra = (float) ($extras[(int) date('n', $ts)] ?? 0);
+            $pay = round(min($payment + $extra, $balance + $interest), 2);
+            if ($pay <= $interest && (!$extras || $i > 12)) {
                 break;
             }
             $principal = $pay - $interest;
             $balance = round($balance - $principal, 2);
-            $rows[] = ['month' => date('Y-m', strtotime("+$i months", $date)), 'payment' => $pay,
+            $rows[] = ['month' => date('Y-m', $ts), 'payment' => $pay, 'extra' => min($extra, $pay),
                 'interest' => $interest, 'principal' => $principal, 'balance' => max(0, $balance)];
         }
         return $rows;
+    }
+
+    /** Résumé d'un scénario de remboursement : durée, date de fin, intérêts totaux (null si jamais remboursé). */
+    public static function payoffSummary(float $balance, float $annualRate, float $payment, array $extras = []): ?array
+    {
+        $rows = self::amortization($balance, $annualRate, $payment, 600, $extras);
+        if (!$rows || end($rows)['balance'] > 0) {
+            return null;
+        }
+        return ['months' => count($rows), 'end' => end($rows)['month'],
+            'interest' => round(array_sum(array_column($rows, 'interest')), 2),
+            'total' => round(array_sum(array_column($rows, 'payment')), 2)];
+    }
+
+    /** Mensualité nécessaire pour rembourser un solde en N mois. */
+    public static function paymentForMonths(float $balance, float $annualRate, int $months): float
+    {
+        if ($months <= 0) {
+            return $balance;
+        }
+        $r = $annualRate / 100 / 12;
+        $p = $r == 0.0 ? $balance / $months : $balance * $r / (1 - (1 + $r) ** -$months);
+        return ceil($p * 20) / 20; // arrondi aux 5 centimes supérieurs
     }
 
     /** Montant épargné par objectif : [goal_id => total]. */

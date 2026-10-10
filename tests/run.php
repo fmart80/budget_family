@@ -12,6 +12,7 @@ spl_autoload_register(function (string $class): void {
 
 use App\Controllers\BillsController;
 use App\Finance;
+use App\Forecast;
 use App\Import\CamtImporter;
 use App\Import\CsvImporter;
 use App\Import\Parse;
@@ -74,6 +75,25 @@ eq(null, BillsController::nextDueDate('2026-10-15', 'none'), 'unique');
 eq(10, Finance::monthsToPayOff(1000, 0, 100), 'sans intérêts');
 eq(null, Finance::monthsToPayOff(10000, 12, 100), 'mensualité insuffisante');
 eq(47, Finance::monthsToPayOff(18000, 3.9, 420), 'leasing 3.9 %');
+
+echo "Remboursement anticipé (carte de crédit 4'500.- à 12 %)\n";
+eq(36, Finance::payoffSummary(4500, 12, 150)['months'], '150.-/mois : 36 mois');
+eq(876.93, Finance::payoffSummary(4500, 12, 150)['interest'], '150.-/mois : intérêts');
+eq(8, Finance::payoffSummary(4500, 12, 600)['months'], '600.-/mois : 8 mois');
+eq(null, Finance::payoffSummary(4500, 12, 40), 'mensualité < intérêts : jamais remboursée');
+$withExtras = Finance::amortization(4500, 12, 150, 600, [6 => 1000, 12 => 1000]);
+eq(1150.0, array_values(array_filter($withExtras, fn ($r) => str_ends_with($r['month'], '-12')))[0]['payment'], 'versement extra en décembre');
+eq(399.85, Finance::paymentForMonths(4500, 12, 12), 'mensualité pour finir en 12 mois');
+eq(100.0, Finance::paymentForMonths(1200, 0, 12), 'mensualité sans intérêts');
+
+echo "Postes prévus et lissage\n";
+eq([6, 12], Forecast::parseMonths('12,6,13,0,6'), 'mois triés et filtrés');
+eq('juin, déc', Forecast::describeMonths([6, 12]), 'libellé des mois');
+eq('tous les mois', Forecast::describeMonths(range(1, 12)), 'libellé tous les mois');
+$item = ['month_list' => [6, 12], 'start_month' => '2027-01', 'end_month' => null];
+eq(false, Forecast::occursIn($item, '2026-12'), 'avant la date de début');
+eq(true, Forecast::occursIn($item, '2027-06'), 'mois concerné');
+eq(false, Forecast::occursIn($item, '2027-07'), 'mois non concerné');
 
 echo $failures ? "\n$failures échec(s)\n" : "\nTous les tests passent.\n";
 exit($failures ? 1 : 0);

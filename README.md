@@ -11,9 +11,13 @@ Application web en PHP pour gérer le budget d'une famille : comptes, transactio
 | **Transactions** | Dépenses, revenus et virements entre comptes. Filtres, recherche, catégorisation groupée, export CSV (Excel) |
 | **Import bancaire** | CSV **UBS** (FR/DE) et **BCF**, XML ISO 20022 **camt.053/054** (ou ZIP). Aperçu avant import, doublons détectés, catégorisation automatique |
 | **Catégories & règles** | Catégories adaptées aux ménages suisses (LAMal, impôts, Serafe…). Règles « mot-clé → catégorie » |
-| **Budget** | Budget mensuel par catégorie, prévu vs réel, copie du mois précédent |
+| **Budget** | Budget mensuel par catégorie, prévu vs réel, copie du mois précédent ou remplissage avec la moyenne des 3 / 6 / 12 derniers mois |
+| **Postes prévus** | Plan annuel des revenus et dépenses, y compris irréguliers : 13ᵉ salaire (en une ou deux fois), assurance annuelle, impôts, vacances… |
+| **Prévisions** | Solde prévu mois par mois sur 6 à 24 mois, mensualités de dettes comprises, avec repérage des mois difficiles |
+| **Lissage** | Montant à mettre de côté chaque mois pour les dépenses irrégulières, marge mensuelle réelle, plan de compte « réserve factures » |
+| **Analyse** | Dépenses moyennes par catégorie sur 3, 6 et 12 mois, comparées au plan et au mois en cours |
 | **Factures** | Échéances, retards, pièces jointes (PDF/JPG/PNG), factures récurrentes (mensuelle → annuelle) recréées automatiquement au paiement |
-| **Dettes** | Solde restant, échéancier avec intérêts, date de fin estimée, stratégies avalanche et boule de neige |
+| **Dettes** | Solde restant, échéancier avec intérêts, date de fin estimée, stratégies avalanche et boule de neige, simulateur (mensualité, versements extra avec le 13ᵉ, « finir en N mois ») |
 | **Épargne** | Objectifs (fonds d'urgence, vacances, 3ᵉ pilier…), progression, montant à épargner par mois, virement automatique vers le compte épargne |
 | **Utilisateurs** | Plusieurs membres de la famille (rôles administrateur et membre), mots de passe chiffrés, blocage après 5 tentatives échouées |
 
@@ -73,6 +77,12 @@ Activez un certificat **Let's Encrypt** gratuit dans Plesk (**SSL/TLS**). Décom
 4. **Budget** : définissez un montant par catégorie pour le mois.
 5. **Factures, dettes, épargne** : saisissez vos factures récurrentes, vos crédits ou leasings et vos objectifs d'épargne.
 6. **Utilisateurs** (*Plus → Utilisateurs*) : ajoutez les autres membres de la famille.
+
+## Mise à jour d'une installation existante
+Envoyez les nouveaux fichiers par SFTP en remplaçant les anciens, **sans toucher à `config/config.php` ni à `storage/uploads/`**. Les nouvelles tables sont créées automatiquement au premier chargement d'une page (fichiers `database/migrations/`), sans perte de données.
+
+## Guide d'utilisation
+Le menu *Plus → Guide & exemples* explique, avec un exemple chiffré, comment saisir le plan annuel (13ᵉ salaire, assurance ménage…), lire les prévisions, mettre en place le lissage et rembourser une carte de crédit.
 
 ## Import des relevés bancaires
 

@@ -41,6 +41,24 @@ $budgetUsed = $budgetTotal > 0 ? min(100, $totals['expense'] / $budgetTotal * 10
     <div class="col-6 col-lg-3"><div class="card card-body h-100"><div class="stat-label">Dettes restantes</div><div class="stat-value"><?= money($debtRemaining) ?></div></div></div>
 </div>
 
+<?php if ($forecast): ?>
+<div class="card mb-4"><div class="card-body">
+    <div class="d-flex justify-content-between"><h2 class="h6">Prochains mois</h2><a href="<?= url('forecast') ?>" class="small">Prévisions complètes</a></div>
+    <div class="row g-2 text-center">
+    <?php foreach ($forecast['months'] as $i => $r): ?>
+        <div class="col-6 col-md-3"><div class="p-2 rounded <?= $r['balance'] < 0 ? 'bg-danger-subtle' : ($r['net'] < 0 ? 'bg-warning-subtle' : 'bg-light') ?>">
+            <div class="small text-muted"><?= e(month_label($r['month'])) ?><?= $i === 0 ? ' (reste)' : '' ?></div>
+            <div class="fw-semibold amount <?= $r['net'] < 0 ? 'amount-expense' : 'amount-income' ?>"><?= ($r['net'] >= 0 ? '+' : '') . money($r['net'], false) ?></div>
+            <div class="small amount">solde prévu <?= money($r['balance'], false) ?></div>
+        </div></div>
+    <?php endforeach; ?>
+    </div>
+    <?php if ($provision > 0): ?><p class="small text-muted mb-0 mt-2"><i class="bi bi-safe"></i> À mettre de côté chaque mois pour les grosses factures : <strong><?= money($provision) ?></strong> — <a href="<?= url('forecast/smoothing') ?>">lissage</a>.</p><?php endif; ?>
+</div></div>
+<?php else: ?>
+    <div class="alert alert-light border"><i class="bi bi-lightbulb"></i> Pour ne plus être pris de court en fin de mois, saisissez votre <a href="<?= url('planned') ?>">plan annuel</a> (salaires, 13ᵉ, assurances, impôts…) : l'application calculera vos prévisions et le montant à mettre de côté chaque mois. <a href="<?= url('guide') ?>">Guide</a></div>
+<?php endif; ?>
+
 <div class="row g-4 mb-4">
     <div class="col-lg-7"><div class="card h-100"><div class="card-body">
         <h2 class="h6">Revenus et dépenses — 12 derniers mois</h2>

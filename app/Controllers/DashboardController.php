@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Finance;
+use App\Forecast;
 
 final class DashboardController
 {
@@ -49,6 +50,8 @@ final class DashboardController
             'debtRemaining' => $debtRemaining,
             'goals'        => $goals,
             'saved'        => Finance::savedByGoal(),
+            'forecast'     => Forecast::items() ? Forecast::build(4) : null,
+            'provision'    => Forecast::smoothing()['provision'],
             'uncategorized' => (int) db()->query("SELECT COUNT(*) FROM transactions WHERE category_id IS NULL AND type <> 'transfer'")->fetchColumn(),
         ]);
     }

@@ -40,13 +40,37 @@ final class DebtsController
         $stmt = db()->prepare('SELECT * FROM debt_payments WHERE debt_id = ? ORDER BY date DESC, id DESC');
         $stmt->execute([$debt['id']]);
         $remaining = Finance::debtRemaining()[$debt['id']] ?? 0.0;
+        $rate = (float) $debt['interest_rate'];
+
+        // Simulateur : mensualité, versements supplémentaires certains mois (13e salaire…), objectif de durée.
+        $sim = [
+            'payment' => input('sim_payment') !== '' ? abs(parse_amount(input('sim_payment'))) : (float) $debt['monthly_payment'],
+            'extra'   => abs(parse_amount(input('sim_extra'))),
+            'months'  => array_values(array_filter(array_map('intval', (array) ($_GET['sim_months'] ?? [])), fn ($m) => $m >= 1 && $m <= 12)),
+            'target'  => max(0, min(240, (int) input('sim_target'))),
+        ];
+        $extras = $sim['extra'] > 0 ? array_fill_keys($sim['months'], $sim['extra']) : [];
+        $current = Finance::payoffSummary($remaining, $rate, (float) $debt['monthly_payment']);
+        $scenarios = [];
+        foreach (array_unique([100, 150, 200, 250, 300, 400, 500, 750, 1000, (int) $debt['monthly_payment']]) as $p) {
+            if ($p > 0 && $p >= $remaining * $rate / 1200 && $p <= max($remaining, 1) * 1.05) {
+                $scenarios[$p] = Finance::payoffSummary($remaining, $rate, (float) $p);
+            }
+        }
+        ksort($scenarios);
+
         view('debts/show', [
             'title'     => $debt['name'],
             'debt'      => $debt,
             'payments'  => $stmt->fetchAll(),
             'remaining' => $remaining,
-            'schedule'  => Finance::amortization($remaining, (float) $debt['interest_rate'], (float) $debt['monthly_payment']),
+            'schedule'  => Finance::amortization($remaining, $rate, $sim['payment'], 600, $extras),
             'accounts'  => all_accounts(),
+            'sim'       => $sim,
+            'simResult' => Finance::payoffSummary($remaining, $rate, $sim['payment'], $extras),
+            'current'   => $current,
+            'scenarios' => $scenarios,
+            'targetPayment' => $sim['target'] ? Finance::paymentForMonths($remaining, $rate, $sim['target']) : null,
         ]);
     }
 
