@@ -32,7 +32,7 @@ Dans Plesk, ouvrez **Bases de données → Ajouter une base de données**. Chois
 ### 2. Version de PHP
 Dans **Sites Web & Domaines → Paramètres PHP**, sélectionnez **PHP 8.2**. Les extensions `pdo_mysql`, `mbstring` et `dom` sont nécessaires et normalement actives. `zip` est facultative et sert seulement à importer un relevé camt en ZIP.
 
-### 3. Envoi des fichiers (SFTP)
+### 3. Envoi des fichiers (FTP)
 L'application s'installe dans un sous-dossier, par exemple `https://votre-domaine.ch/budget/`. Créez le dossier `/httpdocs/budget/` et envoyez-y **tout le contenu du dépôt**, y compris les fichiers cachés `.htaccess` :
 
 ```
@@ -48,7 +48,7 @@ httpdocs/
     └── index.php
 ```
 
-> Vérifiez que votre client SFTP affiche et envoie les fichiers cachés (FileZilla : *Serveur → Forcer l'affichage des fichiers cachés*).
+> Vérifiez que votre client FTP affiche et envoie les fichiers cachés (FileZilla : *Serveur → Forcer l'affichage des fichiers cachés*).
 
 ### 4. Accès à l'application
 Aucun réglage de Plesk n'est nécessaire : le fichier `budget/.htaccess` sert automatiquement le contenu de `public/`. L'application répond à `https://votre-domaine.ch/budget/` et tout le reste (`config/`, `app/`, `storage/`…) est inaccessible depuis le web.
@@ -82,26 +82,32 @@ Activez un certificat **Let's Encrypt** gratuit dans Plesk (**SSL/TLS**). Décom
 ## Mise à jour d'une installation existante
 
 ### Automatique (GitHub Actions)
-À chaque mise à jour de la branche `main` (fusion d'une pull request), GitHub teste l'application puis l'envoie par SFTP sur KreativMedia (`.github/workflows/deploy.yml`). Les tests sont aussi lancés sur chaque pull request, avant la fusion.
+À chaque mise à jour de la branche `main` (fusion d'une pull request), GitHub teste l'application puis l'envoie par FTP sur KreativMedia (`.github/workflows/deploy.yml`). Les tests sont aussi lancés sur chaque pull request, avant la fusion.
 
 **Configuration (une seule fois)** : dans GitHub, *Settings → Secrets and variables → Actions → New repository secret*, créez :
 
 | Secret | Valeur |
 |---|---|
-| `SFTP_HOST` | serveur SFTP (le même que dans FileZilla), ex. `votre-domaine.ch` |
-| `SFTP_USER` | utilisateur SFTP |
-| `SFTP_PASSWORD` | mot de passe SFTP |
-| `SFTP_PATH` | dossier de l'application, ex. `httpdocs/budget` (chemin tel qu'affiché dans FileZilla à la connexion) |
-| `SFTP_PORT` | facultatif, `22` par défaut |
-| `SFTP_KNOWN_HOSTS` | facultatif mais recommandé : résultat de la commande `ssh-keyscan votre-domaine.ch`. Permet de vérifier qu'on se connecte bien à votre serveur |
+| `FTP_HOST` | serveur FTP (le même que dans FileZilla), ex. `votre-domaine.ch` |
+| `FTP_USER` | utilisateur FTP |
+| `FTP_PASSWORD` | mot de passe FTP |
+| `FTP_PATH` | dossier de l'application, ex. `httpdocs/budget` (chemin tel qu'affiché dans FileZilla à la connexion) |
+| `FTP_PORT` | facultatif, `21` par défaut |
+| `FTP_SECURITY` | facultatif : `tls` (défaut), `tls-noverify` ou `none` (voir ci-dessous) |
 
+**Chiffrement de la connexion (`FTP_SECURITY`)**
+- `tls` (par défaut) : FTP chiffré (FTPS) et certificat du serveur vérifié. C'est le plus sûr.
+- `tls-noverify` : FTP chiffré, mais sans vérifier le certificat. À utiliser si le déploiement échoue avec « Certificate verification… not trusted », ce qui arrive souvent sur Plesk, où le certificat FTP est au nom du serveur et non de votre domaine. Autre solution : mettre dans `FTP_HOST` le nom du serveur figurant sur ce certificat (FileZilla l'affiche à la première connexion).
+- `none` : FTP non chiffré. Le mot de passe circule en clair sur Internet. À réserver au cas où le serveur refuse le chiffrement.
+
+**À savoir**
 - Les fichiers `config/config.php` et `storage/uploads/` ne sont **jamais envoyés ni supprimés**. Le dossier `tests/` n'est pas envoyé.
 - Tant que les secrets ne sont pas créés, le déploiement est simplement ignoré (avertissement dans l'onglet *Actions*).
 - Pour relancer un déploiement manuellement : onglet *Actions → Tests et déploiement → Run workflow* (branche `main`).
 - Suivi : onglet *Actions* du dépôt. Une coche verte signifie que le site est à jour.
 - Les fichiers supprimés du dépôt ne sont pas supprimés du serveur. C'est sans danger, car l'application ne les utilise plus.
 
-### Manuelle (SFTP)
+### Manuelle (FTP)
 Envoyez les nouveaux fichiers en remplaçant les anciens, **sans toucher à `config/config.php` ni à `storage/uploads/`**.
 
 Dans les deux cas, les nouvelles tables sont créées automatiquement au premier chargement d'une page (fichiers `database/migrations/`), sans perte de données.

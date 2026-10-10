@@ -1,13 +1,16 @@
-# Tests à chaque pull request, puis déploiement automatique sur KreativMedia (SFTP)
+# Tests à chaque pull request, puis déploiement automatique sur KreativMedia (FTP)
 # à chaque mise à jour de la branche main.
 #
 # Secrets à créer dans GitHub : Settings → Secrets and variables → Actions → New repository secret
-#   SFTP_HOST          ex. votre-domaine.ch (ou le nom du serveur indiqué par KreativMedia)
-#   SFTP_USER          utilisateur SFTP (Plesk → Accès FTP / Connexion Web Hosting)
-#   SFTP_PASSWORD      mot de passe SFTP
-#   SFTP_PATH          dossier de l'application sur le serveur, ex. httpdocs/budget
-#   SFTP_PORT          (facultatif) port SSH, 22 par défaut
-#   SFTP_KNOWN_HOSTS   (facultatif, recommandé) empreinte du serveur : sortie de « ssh-keyscan votre-domaine.ch »
+#   FTP_HOST       serveur FTP (le même que dans FileZilla), ex. votre-domaine.ch
+#   FTP_USER       utilisateur FTP (Plesk → Accès FTP)
+#   FTP_PASSWORD   mot de passe FTP
+#   FTP_PATH       dossier de l'application sur le serveur, ex. httpdocs/budget
+#   FTP_PORT       (facultatif) 21 par défaut
+#   FTP_SECURITY   (facultatif) chiffrement de la connexion :
+#                    tls          (défaut) FTP chiffré (FTPS explicite), certificat vérifié
+#                    tls-noverify FTP chiffré, certificat non vérifié (certificat Plesk au nom du serveur)
+#                    none         FTP non chiffré : mot de passe en clair, à éviter
 #
 # Les fichiers propres au serveur ne sont jamais envoyés ni supprimés :
 # config/config.php (accès à la base) et storage/uploads/ (factures jointes).
@@ -57,13 +60,13 @@ jobs:
       - name: Vérification des secrets
         id: secrets
         env:
-          SFTP_HOST: ${{ secrets.SFTP_HOST }}
-          SFTP_USER: ${{ secrets.SFTP_USER }}
-          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
-          SFTP_PATH: ${{ secrets.SFTP_PATH }}
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_PATH: ${{ secrets.FTP_PATH }}
         run: |
-          if [ -z "$SFTP_HOST" ] || [ -z "$SFTP_USER" ] || [ -z "$SFTP_PASSWORD" ] || [ -z "$SFTP_PATH" ]; then
-            echo "::warning::Secrets SFTP non configurés : déploiement ignoré. Voir l'en-tête de .github/workflows/deploy.yml."
+          if [ -z "$FTP_HOST" ] || [ -z "$FTP_USER" ] || [ -z "$FTP_PASSWORD" ] || [ -z "$FTP_PATH" ]; then
+            echo "::warning::Secrets FTP non configurés : déploiement ignoré. Voir l'en-tête de .github/workflows/deploy.yml."
             echo "ready=false" >> "$GITHUB_OUTPUT"
           else
             echo "ready=true" >> "$GITHUB_OUTPUT"
@@ -73,30 +76,31 @@ jobs:
         if: steps.secrets.outputs.ready == 'true'
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
 
-      - name: Envoi des fichiers par SFTP
+      - name: Envoi des fichiers par FTP
         if: steps.secrets.outputs.ready == 'true'
         env:
-          SFTP_HOST: ${{ secrets.SFTP_HOST }}
-          SFTP_USER: ${{ secrets.SFTP_USER }}
-          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
-          SFTP_PATH: ${{ secrets.SFTP_PATH }}
-          SFTP_PORT: ${{ secrets.SFTP_PORT }}
-          SFTP_KNOWN_HOSTS: ${{ secrets.SFTP_KNOWN_HOSTS }}
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_PATH: ${{ secrets.FTP_PATH }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+          FTP_SECURITY: ${{ secrets.FTP_SECURITY }}
         run: |
-          mkdir -p ~/.ssh && chmod 700 ~/.ssh
-          if [ -n "$SFTP_KNOWN_HOSTS" ]; then
-            printf '%s\n' "$SFTP_KNOWN_HOSTS" > ~/.ssh/known_hosts
-            HOSTKEY="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts"
-          else
-            echo "::warning::SFTP_KNOWN_HOSTS non défini : l'empreinte du serveur n'est pas vérifiée."
-            HOSTKEY="-o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=$HOME/.ssh/known_hosts"
-          fi
-          export LFTP_PASSWORD="$SFTP_PASSWORD"
+          case "${FTP_SECURITY:-tls}" in
+            tls)          SECURITY="set ftp:ssl-force true; set ftp:ssl-protect-data true; set ssl:verify-certificate true;" ;;
+            tls-noverify) SECURITY="set ftp:ssl-force true; set ftp:ssl-protect-data true; set ssl:verify-certificate false;"
+                          echo "::warning::Certificat du serveur FTP non vérifié (FTP_SECURITY=tls-noverify)." ;;
+            none)         SECURITY="set ftp:ssl-allow false;"
+                          echo "::warning::FTP non chiffré : le mot de passe circule en clair (FTP_SECURITY=none)." ;;
+            *)            echo "::error::FTP_SECURITY doit valoir tls, tls-noverify ou none."; exit 1 ;;
+          esac
+          export LFTP_PASSWORD="$FTP_PASSWORD"
           lftp -e "
             set net:max-retries 3;
             set net:timeout 30;
-            set sftp:connect-program 'ssh -a -x $HOSTKEY';
-            open --env-password -u '$SFTP_USER' -p '${SFTP_PORT:-22}' 'sftp://$SFTP_HOST';
+            set ftp:passive-mode true;
+            $SECURITY
+            open --env-password -u '$FTP_USER' -p '${FTP_PORT:-21}' 'ftp://$FTP_HOST';
             mirror --reverse --verbose --overwrite --no-perms \
               --exclude-glob .git/ \
               --exclude-glob .github/ \
@@ -104,11 +108,11 @@ jobs:
               --exclude-glob .gitignore \
               --exclude config/config.php \
               --exclude-glob storage/uploads/ \
-              ./ '$SFTP_PATH';
+              ./ '$FTP_PATH';
             bye
           "
 
-      - name: Vérification du site
+      - name: Fin du déploiement
         if: steps.secrets.outputs.ready == 'true'
         run: |
           echo "Déploiement terminé. Ouvrez votre site : les mises à jour de la base s'appliquent au premier chargement."
