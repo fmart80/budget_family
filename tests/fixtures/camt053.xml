@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.08">
+ <BkToCstmrStmt><Stmt><Acct><Id><IBAN>CH9300768011623852957</IBAN></Id></Acct>
+  <Ntry><Amt Ccy="CHF">1850.00</Amt><CdtDbtInd>DBIT</CdtDbtInd><Sts><Cd>BOOK</Cd></Sts><BookgDt><Dt>2026-08-10</Dt></BookgDt><AcctSvcrRef>REF-001</AcctSvcrRef>
+   <NtryDtls><TxDtls><RltdPties><Cdtr><Pty><Nm>Régie Immobilière SA</Nm></Pty></Cdtr></RltdPties><RmtInf><Ustrd>Loyer août</Ustrd></RmtInf></TxDtls></NtryDtls>
+   <AddtlNtryInf>Ordre permanent</AddtlNtryInf></Ntry>
+  <Ntry><Amt Ccy="CHF">600.00</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts><Cd>BOOK</Cd></Sts><BookgDt><Dt>2026-08-05</Dt></BookgDt><AcctSvcrRef>REF-002</AcctSvcrRef>
+   <NtryDtls><TxDtls><RltdPties><Dbtr><Pty><Nm>Caisse AVS Fribourg</Nm></Pty></Dbtr></RltdPties></TxDtls></NtryDtls></Ntry>
+  <Ntry><Amt Ccy="CHF">10.00</Amt><CdtDbtInd>DBIT</CdtDbtInd><Sts><Cd>PDNG</Cd></Sts><BookgDt><Dt>2026-08-31</Dt></BookgDt></Ntry>
+ </Stmt></BkToCstmrStmt></Document>

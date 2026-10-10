@@ -1,0 +1,17 @@
+# Permet d'installer l'application dans un sous-dossier (ex. https://votre-domaine.ch/budget/)
+# sans faire apparaître « /public » dans l'adresse : toutes les requêtes sont servies depuis public/.
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Si le site est servi via un alias ou si les URL ne fonctionnent pas, décommentez :
+    # RewriteBase /budget/
+
+    # Forcer HTTPS (décommentez après avoir activé le certificat SSL dans Plesk)
+    # RewriteCond %{HTTPS} !=on
+    # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    RewriteRule ^$ public/ [L]
+    RewriteRule ^((?!public/).*)$ public/$1 [L]
+</IfModule>

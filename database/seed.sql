@@ -1,0 +1,21 @@
+-- Catégories par défaut (adaptées à un ménage suisse)
+INSERT IGNORE INTO categories (name, type, color) VALUES
+('Salaire', 'income', '#198754'),
+('Allocations familiales', 'income', '#20c997'),
+('Autres revenus', 'income', '#0dcaf0'),
+('Loyer / Hypothèque', 'expense', '#0d6efd'),
+('Charges & énergie', 'expense', '#6610f2'),
+('Alimentation', 'expense', '#fd7e14'),
+('Assurance maladie (LAMal)', 'expense', '#d63384'),
+('Assurances diverses', 'expense', '#6f42c1'),
+('Impôts', 'expense', '#dc3545'),
+('Transports', 'expense', '#ffc107'),
+('Télécom & Internet', 'expense', '#0dcaf0'),
+('Enfants & école', 'expense', '#20c997'),
+('Santé', 'expense', '#e83e8c'),
+('Loisirs & sorties', 'expense', '#17a2b8'),
+('Vacances', 'expense', '#28a745'),
+('Habillement', 'expense', '#adb5bd'),
+('Remboursement de dettes', 'expense', '#343a40'),
+('Épargne', 'expense', '#198754'),
+('Divers', 'expense', '#6c757d');
