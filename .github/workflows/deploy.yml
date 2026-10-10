@@ -1,0 +1,114 @@
+# Tests à chaque pull request, puis déploiement automatique sur KreativMedia (SFTP)
+# à chaque mise à jour de la branche main.
+#
+# Secrets à créer dans GitHub : Settings → Secrets and variables → Actions → New repository secret
+#   SFTP_HOST          ex. votre-domaine.ch (ou le nom du serveur indiqué par KreativMedia)
+#   SFTP_USER          utilisateur SFTP (Plesk → Accès FTP / Connexion Web Hosting)
+#   SFTP_PASSWORD      mot de passe SFTP
+#   SFTP_PATH          dossier de l'application sur le serveur, ex. httpdocs/budget
+#   SFTP_PORT          (facultatif) port SSH, 22 par défaut
+#   SFTP_KNOWN_HOSTS   (facultatif, recommandé) empreinte du serveur : sortie de « ssh-keyscan votre-domaine.ch »
+#
+# Les fichiers propres au serveur ne sont jamais envoyés ni supprimés :
+# config/config.php (accès à la base) et storage/uploads/ (factures jointes).
+
+name: Tests et déploiement
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, dom, pdo_mysql, zip
+          coverage: none
+
+      - name: Vérification de la syntaxe PHP
+        run: find app public tests -name '*.php' -print0 | xargs -0 -n1 php -l > /dev/null
+
+      - name: Tests des imports et des calculs
+        run: php tests/run.php
+
+  deploy:
+    name: Déploiement KreativMedia
+    needs: tests
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Vérification des secrets
+        id: secrets
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PATH: ${{ secrets.SFTP_PATH }}
+        run: |
+          if [ -z "$SFTP_HOST" ] || [ -z "$SFTP_USER" ] || [ -z "$SFTP_PASSWORD" ] || [ -z "$SFTP_PATH" ]; then
+            echo "::warning::Secrets SFTP non configurés : déploiement ignoré. Voir l'en-tête de .github/workflows/deploy.yml."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Installation de lftp
+        if: steps.secrets.outputs.ready == 'true'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Envoi des fichiers par SFTP
+        if: steps.secrets.outputs.ready == 'true'
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PATH: ${{ secrets.SFTP_PATH }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          SFTP_KNOWN_HOSTS: ${{ secrets.SFTP_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          if [ -n "$SFTP_KNOWN_HOSTS" ]; then
+            printf '%s\n' "$SFTP_KNOWN_HOSTS" > ~/.ssh/known_hosts
+            HOSTKEY="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts"
+          else
+            echo "::warning::SFTP_KNOWN_HOSTS non défini : l'empreinte du serveur n'est pas vérifiée."
+            HOSTKEY="-o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=$HOME/.ssh/known_hosts"
+          fi
+          export LFTP_PASSWORD="$SFTP_PASSWORD"
+          lftp -e "
+            set net:max-retries 3;
+            set net:timeout 30;
+            set sftp:connect-program 'ssh -a -x $HOSTKEY';
+            open --env-password -u '$SFTP_USER' -p '${SFTP_PORT:-22}' 'sftp://$SFTP_HOST';
+            mirror --reverse --verbose --overwrite --no-perms \
+              --exclude-glob .git/ \
+              --exclude-glob .github/ \
+              --exclude-glob tests/ \
+              --exclude-glob .gitignore \
+              --exclude config/config.php \
+              --exclude-glob storage/uploads/ \
+              ./ '$SFTP_PATH';
+            bye
+          "
+
+      - name: Vérification du site
+        if: steps.secrets.outputs.ready == 'true'
+        run: |
+          echo "Déploiement terminé. Ouvrez votre site : les mises à jour de la base s'appliquent au premier chargement."

@@ -80,7 +80,31 @@ Activez un certificat **Let's Encrypt** gratuit dans Plesk (**SSL/TLS**). Décom
 6. **Utilisateurs** (*Plus → Utilisateurs*) : ajoutez les autres membres de la famille.
 
 ## Mise à jour d'une installation existante
-Envoyez les nouveaux fichiers par SFTP en remplaçant les anciens, **sans toucher à `config/config.php` ni à `storage/uploads/`**. Les nouvelles tables sont créées automatiquement au premier chargement d'une page (fichiers `database/migrations/`), sans perte de données.
+
+### Automatique (GitHub Actions)
+À chaque mise à jour de la branche `main` (fusion d'une pull request), GitHub teste l'application puis l'envoie par SFTP sur KreativMedia (`.github/workflows/deploy.yml`). Les tests sont aussi lancés sur chaque pull request, avant la fusion.
+
+**Configuration (une seule fois)** : dans GitHub, *Settings → Secrets and variables → Actions → New repository secret*, créez :
+
+| Secret | Valeur |
+|---|---|
+| `SFTP_HOST` | serveur SFTP (le même que dans FileZilla), ex. `votre-domaine.ch` |
+| `SFTP_USER` | utilisateur SFTP |
+| `SFTP_PASSWORD` | mot de passe SFTP |
+| `SFTP_PATH` | dossier de l'application, ex. `httpdocs/budget` (chemin tel qu'affiché dans FileZilla à la connexion) |
+| `SFTP_PORT` | facultatif, `22` par défaut |
+| `SFTP_KNOWN_HOSTS` | facultatif mais recommandé : résultat de la commande `ssh-keyscan votre-domaine.ch`. Permet de vérifier qu'on se connecte bien à votre serveur |
+
+- Les fichiers `config/config.php` et `storage/uploads/` ne sont **jamais envoyés ni supprimés**. Le dossier `tests/` n'est pas envoyé.
+- Tant que les secrets ne sont pas créés, le déploiement est simplement ignoré (avertissement dans l'onglet *Actions*).
+- Pour relancer un déploiement manuellement : onglet *Actions → Tests et déploiement → Run workflow* (branche `main`).
+- Suivi : onglet *Actions* du dépôt. Une coche verte signifie que le site est à jour.
+- Les fichiers supprimés du dépôt ne sont pas supprimés du serveur. C'est sans danger, car l'application ne les utilise plus.
+
+### Manuelle (SFTP)
+Envoyez les nouveaux fichiers en remplaçant les anciens, **sans toucher à `config/config.php` ni à `storage/uploads/`**.
+
+Dans les deux cas, les nouvelles tables sont créées automatiquement au premier chargement d'une page (fichiers `database/migrations/`), sans perte de données.
 
 ## Guide d'utilisation
 Le menu *Plus → Guide & exemples* explique, avec un exemple chiffré, comment saisir le plan annuel (13ᵉ salaire, assurance ménage…), lire les prévisions, mettre en place le lissage et rembourser une carte de crédit.
