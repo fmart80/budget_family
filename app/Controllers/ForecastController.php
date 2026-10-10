@@ -69,7 +69,8 @@ final class ForecastController
     public function planFromAverage(): void
     {
         $period = in_array((int) input('period'), [3, 6, 12], true) ? (int) input('period') : 6;
-        $planned = array_flip(array_filter(array_map(fn ($i) => (int) $i['category_id'], Forecast::items(false))));
+        $planned = array_flip(array_filter(array_map(fn ($i) => (int) $i['category_id'],
+            array_merge(Forecast::items(false), \App\Subscriptions::asPlannedItems()))));
         $names = [];
         foreach (all_categories('expense') as $c) {
             $names[(int) $c['id']] = $c['name'];

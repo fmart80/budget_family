@@ -8,7 +8,7 @@ foreach ($spending as $cid => $total) {
 $pie = ['type' => 'doughnut', 'data' => ['labels' => $labels, 'datasets' => [['data' => $values, 'backgroundColor' => $colors]]],
     'options' => ['plugins' => ['legend' => ['position' => 'right']]]];
 $bar = ['type' => 'bar', 'data' => [
-    'labels' => array_map(fn ($h) => substr(month_label($h['month']), 0, 3) . ' ' . substr($h['month'], 2, 2), $history),
+    'labels' => array_map(fn ($h) => mb_substr(month_label($h['month']), 0, 3) . ' ' . substr($h['month'], 2, 2), $history),
     'datasets' => [
         ['label' => 'Revenus', 'data' => array_column($history, 'income'), 'backgroundColor' => '#198754'],
         ['label' => 'Dépenses', 'data' => array_column($history, 'expense'), 'backgroundColor' => '#dc3545'],
@@ -107,3 +107,20 @@ $budgetUsed = $budgetTotal > 0 ? min(100, $totals['expense'] / $budgetTotal * 10
         <?php endforeach; ?>
     </div></div></div>
 </div>
+
+<?php if ($subs): $subMonthly = array_sum(array_column($subs, 'monthly')); $subCard = array_sum(array_map(fn ($x) => $x['on_card'] ? $x['monthly'] : 0, $subs)); ?>
+<div class="card mt-4"><div class="card-body">
+    <div class="d-flex justify-content-between"><h2 class="h6"><i class="bi bi-collection-play"></i> Abonnements</h2><a href="<?= url('subscriptions') ?>" class="small">Tableau de bord des abonnements</a></div>
+    <div class="row g-3 align-items-center">
+        <div class="col-md-4">
+            <div class="stat-value"><?= money($subMonthly) ?> <small class="fs-6 text-muted">/ mois</small></div>
+            <div class="small text-muted"><?= count($subs) ?> actif(s) · <?= money($subMonthly * 12) ?> par an<?= $subCard > 0 ? ' · <span class="text-warning-emphasis">' . money($subCard) . '/mois sur la carte de crédit</span>' : '' ?></div>
+        </div>
+        <div class="col-md-8"><div class="d-flex flex-wrap gap-2">
+            <?php foreach (array_slice($subs, 0, 6) as $x): ?>
+                <span class="badge text-bg-light border fw-normal p-2"><?= e($x['name']) ?> · <?= money($x['amount'], false) ?> · <?= date('d.m', strtotime($x['next_date'])) ?></span>
+            <?php endforeach; ?>
+        </div></div>
+    </div>
+</div></div>
+<?php endif; ?>

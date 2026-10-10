@@ -4,7 +4,7 @@ $active = fn (string $prefix): string => (str_starts_with($current, $prefix) ? '
 $user = current_user();
 ?>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+<nav class="navbar navbar-expand-xl navbar-dark bg-primary shadow-sm">
     <div class="container-xl">
         <a class="navbar-brand fw-semibold" href="<?= url('dashboard') ?>"><i class="bi bi-piggy-bank"></i> <?= e(config('app_name', 'Budget Famille')) ?></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-label="Menu">
@@ -12,10 +12,10 @@ $user = current_user();
         </button>
         <div class="collapse navbar-collapse" id="nav">
             <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link<?= $active('dashboard') ?>" href="<?= url('dashboard') ?>"><i class="bi bi-speedometer2"></i> Tableau de bord</a></li>
+                <li class="nav-item"><a class="nav-link<?= $active('dashboard') ?>" href="<?= url('dashboard') ?>"><i class="bi bi-speedometer2"></i> Accueil</a></li>
                 <li class="nav-item"><a class="nav-link<?= $active('transactions') ?>" href="<?= url('transactions') ?>"><i class="bi bi-arrow-left-right"></i> Transactions</a></li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle<?= $active('budgets') . $active('planned') . $active('forecast') ?>" href="#" data-bs-toggle="dropdown"><i class="bi bi-clipboard-data"></i> Budget & prévisions</a>
+                    <a class="nav-link dropdown-toggle<?= $active('budgets') . $active('planned') . $active('forecast') ?>" href="#" data-bs-toggle="dropdown"><i class="bi bi-clipboard-data"></i> Budget</a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="<?= url('budgets') ?>"><i class="bi bi-clipboard-data"></i> Budget du mois</a></li>
                         <li><a class="dropdown-item" href="<?= url('planned') ?>"><i class="bi bi-list-check"></i> Postes prévus (plan annuel)</a></li>
@@ -25,6 +25,7 @@ $user = current_user();
                     </ul>
                 </li>
                 <li class="nav-item"><a class="nav-link<?= $active('bills') ?>" href="<?= url('bills') ?>"><i class="bi bi-receipt"></i> Factures</a></li>
+                <li class="nav-item"><a class="nav-link<?= $active('subscriptions') ?>" href="<?= url('subscriptions') ?>"><i class="bi bi-collection-play"></i> Abonnements</a></li>
                 <li class="nav-item"><a class="nav-link<?= $active('debts') ?>" href="<?= url('debts') ?>"><i class="bi bi-credit-card-2-back"></i> Dettes</a></li>
                 <li class="nav-item"><a class="nav-link<?= $active('savings') ?>" href="<?= url('savings') ?>"><i class="bi bi-safe"></i> Épargne</a></li>
                 <li class="nav-item dropdown">

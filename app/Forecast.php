@@ -36,6 +36,10 @@ final class Forecast
         return implode(', ', array_map(fn ($m) => $names[$m], $months));
     }
 
+    /**
+     * Postes prévus (+ abonnements actifs quand $activeOnly, car ils comptent dans les prévisions).
+     * La liste complète (actifs et inactifs, sans abonnements) sert à l'écran des postes prévus.
+     */
     public static function items(bool $activeOnly = true): array
     {
         $sql = 'SELECT p.*, c.name AS category_name, c.color AS category_color FROM planned_items p
@@ -49,8 +53,10 @@ final class Forecast
             $item['annual'] = $item['amount'] * count($item['month_list']);
             $item['monthly_equivalent'] = round($item['annual'] / 12, 2);
             $item['is_regular'] = count($item['month_list']) === 12;
+            $item['source'] = 'planned';
+            $item['edit_url'] = url('planned/edit', ['id' => $item['id']]);
         }
-        return $items;
+        return $activeOnly ? array_merge($items, Subscriptions::asPlannedItems()) : $items;
     }
 
     /** Le poste tombe-t-il ce mois-ci (« AAAA-MM ») ? */

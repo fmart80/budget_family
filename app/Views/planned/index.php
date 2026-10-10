@@ -8,7 +8,7 @@
 </div>
 <p class="text-muted">Listez ici <strong>tout ce qui revient</strong> dans l'année : salaires, 13ᵉ salaire, loyer, LAMal, impôts, assurance ménage, Serafe, vacances, cadeaux de Noël…
     Ces postes alimentent les <a href="<?= url('forecast') ?>">prévisions sur 12 mois</a> et le <a href="<?= url('forecast/smoothing') ?>">lissage</a>.
-    Les mensualités des <a href="<?= url('debts') ?>">dettes</a> sont ajoutées automatiquement : ne les saisissez pas ici. <a href="<?= url('guide') ?>">Voir le guide et des exemples</a>.</p>
+    Les mensualités des <a href="<?= url('debts') ?>">dettes</a> et les <a href="<?= url('subscriptions') ?>">abonnements</a> sont ajoutés automatiquement : ne les saisissez pas ici. <a href="<?= url('guide') ?>">Voir le guide et des exemples</a>.</p>
 
 <?php if ($recurringBills): ?>
 <div class="alert alert-info d-flex flex-wrap justify-content-between align-items-center gap-2">

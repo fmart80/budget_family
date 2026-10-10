@@ -12,3 +12,5 @@ body { background: #f5f7fb; }
 .table-import td { font-size: .875rem; }
 .chart-box { position: relative; height: 280px; }
 @media print { nav, .no-print, .btn { display: none !important; } }
+.navbar .nav-link { white-space: nowrap; }
+@media (min-width: 1200px) { .navbar-expand-xl .navbar-nav .nav-link { padding-left: .5rem; padding-right: .5rem; } }

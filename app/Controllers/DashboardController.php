@@ -5,6 +5,7 @@ namespace App\Controllers;
 
 use App\Finance;
 use App\Forecast;
+use App\Subscriptions;
 
 final class DashboardController
 {
@@ -35,7 +36,11 @@ final class DashboardController
 
         $goals = db()->query('SELECT * FROM savings_goals ORDER BY target_date IS NULL, target_date LIMIT 4')->fetchAll();
 
+        $subs = Subscriptions::all('active');
+        usort($subs, fn ($a, $b) => $a['next_date'] <=> $b['next_date']);
+
         view('dashboard/index', [
+            'subs'         => $subs,
             'title'        => 'Tableau de bord',
             'month'        => $month,
             'totals'       => Finance::monthTotals($month),

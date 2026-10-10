@@ -84,6 +84,14 @@ $routes = [
 
     'guide'                => ['GuideController', 'index'],
 
+    'subscriptions'        => ['SubscriptionsController', 'index'],
+    'subscriptions/edit'   => ['SubscriptionsController', 'edit'],
+    'subscriptions/save'   => ['SubscriptionsController', 'save'],
+    'subscriptions/delete' => ['SubscriptionsController', 'delete'],
+    'subscriptions/status' => ['SubscriptionsController', 'status'],
+    'subscriptions/update_amount' => ['SubscriptionsController', 'updateAmount'],
+    'subscriptions/ignore' => ['SubscriptionsController', 'ignore'],
+
     'bills'                => ['BillsController', 'index'],
     'bills/edit'           => ['BillsController', 'edit'],
     'bills/save'           => ['BillsController', 'save'],

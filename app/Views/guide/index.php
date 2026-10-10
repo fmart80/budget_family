@@ -151,6 +151,25 @@ $base = $cardScenarios[0]['result'];
 </div></div>
 
 <div class="card mb-4"><div class="card-body">
+    <h2 class="h5">Les abonnements (Netflix, Spotify, téléphone…)</h2>
+    <p>Pris un par un, ils semblent petits. Additionnés sur une année, ils pèsent souvent plusieurs centaines de francs. Le menu <a href="<?= url('subscriptions') ?>">Abonnements</a> les rassemble.</p>
+    <ol>
+        <li><strong>Créez votre carte de crédit comme compte</strong> : <a href="<?= url('accounts/edit') ?>">Comptes → Nouveau compte</a>, type « Carte de crédit ». Importez-y aussi les relevés de la carte (CSV ou camt).</li>
+        <li><strong>Ajoutez vos abonnements</strong>, ou laissez l'application les <strong>détecter</strong> dans vos relevés (paiements qui reviennent chaque mois avec le même montant) et cliquez sur « Ajouter ».</li>
+        <li>Indiquez avec quoi chacun est <strong>payé</strong> (carte de crédit, compte UBS…) et le <strong>mot-clé</strong> du relevé (ex. « netflix »).</li>
+    </ol>
+    <p>Ensuite, l'application :</p>
+    <ul>
+        <li>affiche le coût <strong>par mois et par an</strong> (Netflix à 21.90 = 262.80 par an), et la part prélevée sur la carte de crédit ;</li>
+        <li>signale les <strong>hausses de prix</strong> (« Netflix : 21.90 prélevé au lieu de 18.90 ») et les prélèvements qui ont disparu ;</li>
+        <li>prévient avant les <strong>renouvellements annuels</strong>, le bon moment pour résilier ;</li>
+        <li>calcule ce que vos <strong>résiliations</strong> vous ont fait économiser ;</li>
+        <li>intègre automatiquement les abonnements aux <a href="<?= url('forecast') ?>">prévisions</a> et au <a href="<?= url('forecast/smoothing') ?>">lissage</a>. <strong>Ne les saisissez donc pas aussi en postes prévus.</strong></li>
+    </ul>
+    <div class="alert alert-warning small mb-0"><strong>Carte de crédit à rembourser ?</strong> Chaque abonnement prélevé sur la carte s'ajoute à la dette si le relevé n'est pas payé en entier, et coûte donc environ 12 % d'intérêts en plus. Pendant le remboursement : passez-les sur la carte de débit ou TWINT, ou résiliez-les.</div>
+</div></div>
+
+<div class="card mb-4"><div class="card-body">
     <h2 class="h5">Étape 4 — La routine (15 minutes par mois)</h2>
     <div class="row">
         <div class="col-md-6">

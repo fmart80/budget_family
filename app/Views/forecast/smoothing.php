@@ -49,7 +49,7 @@ $hasIrregular = $d['irregular']['expense'] || $d['irregular']['income'];
         <table class="table table-sm mb-0">
             <thead><tr><th>Poste</th><th>Quand</th><th class="text-end">Par an</th><th class="text-end">÷ 12</th></tr></thead>
             <?php foreach ($d['irregular'][$type] as $i): ?>
-                <tr><td><a href="<?= url('planned/edit', ['id' => $i['id']]) ?>" class="text-reset"><?= e($i['name']) ?></a></td><td class="small"><?= e(Forecast::describeMonths($i['month_list'])) ?></td>
+                <tr><td><a href="<?= e($i['edit_url']) ?>" class="text-reset"><?= e($i['name']) ?></a></td><td class="small"><?= e(Forecast::describeMonths($i['month_list'])) ?></td>
                     <td class="text-end amount"><?= money($i['annual'], false) ?></td><td class="text-end amount fw-semibold"><?= money($i['monthly_equivalent'], false) ?></td></tr>
             <?php endforeach; ?>
         </table>

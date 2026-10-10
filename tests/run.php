@@ -16,6 +16,7 @@ use App\Forecast;
 use App\Import\CamtImporter;
 use App\Import\CsvImporter;
 use App\Import\Parse;
+use App\Subscriptions;
 
 $failures = 0;
 function eq(mixed $expected, mixed $actual, string $label): void
@@ -94,6 +95,16 @@ $item = ['month_list' => [6, 12], 'start_month' => '2027-01', 'end_month' => nul
 eq(false, Forecast::occursIn($item, '2026-12'), 'avant la date de début');
 eq(true, Forecast::occursIn($item, '2027-06'), 'mois concerné');
 eq(false, Forecast::occursIn($item, '2027-07'), 'mois non concerné');
+
+echo "Abonnements\n";
+eq('2026-11-08', Subscriptions::nextDate('2026-01-08', 'monthly', '2026-10-09'), 'prochain prélèvement mensuel');
+eq('2026-10-08', Subscriptions::nextDate('2026-01-08', 'monthly', '2026-10-08'), 'prélèvement le jour même');
+eq('2027-03-31', Subscriptions::nextDate('2025-03-31', 'yearly', '2026-04-01'), 'renouvellement annuel');
+eq('2026-11-30', Subscriptions::nextDate('2026-01-31', 'monthly', '2026-11-01'), 'fin de mois conservée');
+eq([2, 5, 8, 11], Subscriptions::monthList('2026-11-20', 'quarterly'), 'mois trimestriels');
+eq('netflix', Subscriptions::merchantKey('NETFLIX.COM 1001 AMSTERDAM'), 'service connu');
+eq('spotify', Subscriptions::merchantKey('Spotify P3000 Stockholm'), 'service connu avec référence');
+eq('ecole musique', Subscriptions::merchantKey('LSV Ecole de Musique Bulle 4512'), 'libellé générique');
 
 echo $failures ? "\n$failures échec(s)\n" : "\nTous les tests passent.\n";
 exit($failures ? 1 : 0);
