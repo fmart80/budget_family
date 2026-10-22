@@ -1,6 +1,17 @@
 Options -Indexes
 DirectoryIndex index.php
 
+<Files ".user.ini">
+    Require all denied
+</Files>
+
+# Même durcissement que .user.ini lorsque PHP tourne en module Apache (mod_php).
+<IfModule mod_php.c>
+    php_flag session.upload_progress.enabled off
+    php_value upload_max_filesize 10M
+    php_value post_max_size 12M
+</IfModule>
+
 <IfModule mod_headers.c>
     Header always set X-Content-Type-Options "nosniff"
 </IfModule>

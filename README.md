@@ -129,6 +129,12 @@ Le menu *Plus → Guide & exemples* explique, avec un exemple chiffré, comment 
 ## Sauvegardes
 Plesk propose des sauvegardes automatiques (**Gestionnaire de sauvegarde**). Vous pouvez aussi exporter la base depuis **phpMyAdmin**. Sauvegardez aussi le dossier `storage/uploads/` (les factures jointes).
 
+## Sécurité
+- **Version de PHP :** gardez PHP à jour dans *Plesk → Paramètres PHP*. Un bandeau rouge, visible uniquement par les administrateurs, s'affiche si la version du serveur a une faille connue (ex. PHP2Shell, CVE-2026-109618 / CVE-2026-109619, corrigée dans PHP 8.2.35 / 8.3.36 / 8.4.27 / 8.5.12) ou approche de sa fin de support. PHP 8.2 ne reçoit plus de correctifs après le 31.12.2026 : préférez PHP 8.4.
+- **Durcissement :** `public/.user.ini` (et `public/.htaccess` pour mod_php) désactive `session.upload_progress` (inutilisé par l'application) et limite la taille des requêtes. Cela réduit la surface d'attaque, mais **ne remplace pas la mise à jour de PHP**.
+- **Contrôle d'intégrité :** à chaque déploiement, GitHub Actions liste les fichiers présents sur le serveur mais absents du dépôt, avec un avertissement s'il s'agit de fichiers PHP ou de configuration (fichier ancien ou déposé par un tiers). Rien n'est supprimé automatiquement.
+- **Tests :** l'application est testée sur PHP 8.2, 8.3, 8.4 et 8.5 à chaque pull request.
+
 ## Développement local
 ```bash
 cp config/config.example.php config/config.php   # puis adapter

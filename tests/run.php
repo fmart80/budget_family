@@ -10,6 +10,8 @@ spl_autoload_register(function (string $class): void {
     }
 });
 
+require APP_PATH . '/helpers.php';
+
 use App\Controllers\BillsController;
 use App\Finance;
 use App\Forecast;
@@ -105,6 +107,14 @@ eq([2, 5, 8, 11], Subscriptions::monthList('2026-11-20', 'quarterly'), 'mois tri
 eq('netflix', Subscriptions::merchantKey('NETFLIX.COM 1001 AMSTERDAM'), 'service connu');
 eq('spotify', Subscriptions::merchantKey('Spotify P3000 Stockholm'), 'service connu avec référence');
 eq('ecole musique', Subscriptions::merchantKey('LSV Ecole de Musique Bulle 4512'), 'libellé générique');
+
+echo "Sécurité PHP\n";
+eq('danger', php_security_status('8.2.34', '2026-10-22')['level'] ?? null, 'PHP 8.2.34 vulnérable (PHP2Shell)');
+eq('warning', php_security_status('8.2.35', '2026-10-22')['level'] ?? null, 'PHP 8.2.35 corrigé mais fin de support proche');
+eq(null, php_security_status('8.4.27', '2026-10-22'), 'PHP 8.4.27 à jour');
+eq('danger', php_security_status('8.3.35', '2026-10-22')['level'] ?? null, 'PHP 8.3.35 vulnérable');
+eq('danger', php_security_status('8.1.33', '2026-10-22')['level'] ?? null, 'PHP 8.1 plus maintenu');
+eq('danger', php_security_status('8.2.40', '2027-01-15')['level'] ?? null, 'PHP 8.2 après sa fin de support');
 
 echo $failures ? "\n$failures échec(s)\n" : "\nTous les tests passent.\n";
 exit($failures ? 1 : 0);
