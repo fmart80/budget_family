@@ -31,6 +31,30 @@ final class SavingsController
         return $months > 0 ? round($left / $months, 2) : $left;
     }
 
+    /** Versement mensuel moyen des 6 derniers mois (ou depuis la création de l'objectif). */
+    public static function pace(array $goal): float
+    {
+        $since = max(date('Y-m-d', strtotime('-6 months')), substr((string) $goal['created_at'], 0, 10));
+        $stmt = db()->prepare("SELECT COALESCE(SUM(amount), 0) FROM savings_contributions
+            WHERE goal_id = ? AND date >= ? AND (notes IS NULL OR notes <> 'Montant déjà épargné')");
+        $stmt->execute([$goal['id'], $since]);
+        $months = max(1, (int) round((time() - strtotime($since)) / (30.44 * 86400)));
+        return round((float) $stmt->fetchColumn() / $months, 2);
+    }
+
+    /** Date estimée d'arrivée au rythme actuel (AAAA-MM), null si le rythme est nul. */
+    public static function eta(array $goal, float $saved, float $pace): ?string
+    {
+        $left = (float) $goal['target_amount'] - $saved;
+        if ($left <= 0) {
+            return date('Y-m');
+        }
+        if ($pace <= 0) {
+            return null;
+        }
+        return date('Y-m', strtotime('+' . (int) ceil($left / $pace) . ' months', strtotime(date('Y-m-01'))));
+    }
+
     public function index(): void
     {
         view('savings/index', [

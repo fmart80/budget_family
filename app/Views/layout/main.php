@@ -15,13 +15,17 @@ $user = current_user();
                 <li class="nav-item"><a class="nav-link<?= $active('dashboard') ?>" href="<?= url('dashboard') ?>"><i class="bi bi-speedometer2"></i> Accueil</a></li>
                 <li class="nav-item"><a class="nav-link<?= $active('transactions') ?>" href="<?= url('transactions') ?>"><i class="bi bi-arrow-left-right"></i> Transactions</a></li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle<?= $active('budgets') . $active('planned') . $active('forecast') ?>" href="#" data-bs-toggle="dropdown"><i class="bi bi-clipboard-data"></i> Budget</a>
+                    <a class="nav-link dropdown-toggle<?= $active('budgets') . $active('planned') . $active('forecast') . $active('calendar') . $active('score') . $active('taxes') ?>" href="#" data-bs-toggle="dropdown"><i class="bi bi-clipboard-data"></i> Budget</a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="<?= url('budgets') ?>"><i class="bi bi-clipboard-data"></i> Budget du mois</a></li>
                         <li><a class="dropdown-item" href="<?= url('planned') ?>"><i class="bi bi-list-check"></i> Postes prévus (plan annuel)</a></li>
                         <li><a class="dropdown-item" href="<?= url('forecast') ?>"><i class="bi bi-graph-up-arrow"></i> Prévisions 12 mois</a></li>
                         <li><a class="dropdown-item" href="<?= url('forecast/smoothing') ?>"><i class="bi bi-distribute-vertical"></i> Lissage des dépenses</a></li>
                         <li><a class="dropdown-item" href="<?= url('forecast/analysis') ?>"><i class="bi bi-bar-chart"></i> Analyse 3 / 6 / 12 mois</a></li>
+                        <li><a class="dropdown-item" href="<?= url('calendar') ?>"><i class="bi bi-calendar3"></i> Calendrier des prélèvements</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="<?= url('score') ?>"><i class="bi bi-speedometer"></i> Score financier</a></li>
+                        <li><a class="dropdown-item" href="<?= url('taxes') ?>"><i class="bi bi-bank2"></i> Impôts (estimation)</a></li>
                     </ul>
                 </li>
                 <li class="nav-item"><a class="nav-link<?= $active('bills') ?>" href="<?= url('bills') ?>"><i class="bi bi-receipt"></i> Factures</a></li>

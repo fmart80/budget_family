@@ -2,6 +2,8 @@
 use App\Controllers\SavingsController;
 $pct = $goal['target_amount'] > 0 ? min(100, $saved / $goal['target_amount'] * 100) : 0;
 $monthly = SavingsController::monthlyNeeded($goal, $saved);
+$pace = SavingsController::pace($goal);
+$eta = $pct < 100 ? SavingsController::eta($goal, $saved, $pace) : null;
 ?>
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
     <div><h1 class="h3 mb-0"><?= e($goal['name']) ?></h1>
@@ -19,6 +21,13 @@ $monthly = SavingsController::monthlyNeeded($goal, $saved);
     <div class="progress my-2" style="height: 1rem"><div class="progress-bar" style="width: <?= round($pct) ?>%; background: <?= e($goal['color']) ?>"><?= round($pct) ?> %</div></div>
     <div class="small text-muted">Reste <?= money(max(0, $goal['target_amount'] - $saved)) ?>
         <?php if ($goal['target_date']): ?> · échéance <?= date_ch($goal['target_date']) ?><?php if ($monthly > 0): ?> · à épargner : <strong><?= money($monthly) ?> par mois</strong><?php endif; ?><?php endif; ?></div>
+    <?php if ($pct < 100): ?>
+        <div class="small mt-1">
+            <?php if ($eta): ?>Au rythme actuel (<strong><?= money($pace) ?> par mois</strong> en moyenne), objectif atteint en <strong><?= e(month_label($eta)) ?></strong>
+                <?php if ($goal['target_date']): ?><?= $eta > substr($goal['target_date'], 0, 7) ? '<span class="badge text-bg-danger">en retard sur la date visée</span>' : '<span class="badge text-bg-success">dans les temps</span>' ?><?php endif; ?>
+            <?php else: ?>Aucun versement ces 6 derniers mois : impossible d'estimer une date d'arrivée.<?php endif; ?>
+        </div>
+    <?php endif; ?>
     <?php if ($goal['notes']): ?><p class="small mt-2 mb-0"><?= nl2br(e($goal['notes'])) ?></p><?php endif; ?>
 </div>
 <div class="row g-4">

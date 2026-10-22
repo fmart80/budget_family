@@ -15,6 +15,8 @@
     $s = $saved[$g['id']] ?? 0;
     $pct = $g['target_amount'] > 0 ? min(100, $s / $g['target_amount'] * 100) : 0;
     $monthly = SavingsController::monthlyNeeded($g, $s);
+    $pace = SavingsController::pace($g);
+    $eta = $pct < 100 ? SavingsController::eta($g, $s, $pace) : null;
 ?>
     <div class="col-md-6 col-xl-4">
         <a href="<?= url('savings/show', ['id' => $g['id']]) ?>" class="card h-100 text-reset text-decoration-none" style="border-top: 4px solid <?= e($g['color']) ?>">
@@ -27,6 +29,8 @@
                     <span><?= round($pct) ?> %</span>
                     <span><?php if ($g['target_date']): ?>pour le <?= date_ch($g['target_date']) ?><?php if ($monthly > 0): ?> · <?= money($monthly) ?>/mois<?php endif; ?><?php endif; ?></span>
                 </div>
+                <?php if ($pct < 100): ?><div class="small mt-1 <?= $eta && $g['target_date'] && $eta > substr($g['target_date'], 0, 7) ? 'text-danger' : 'text-muted' ?>">
+                    <?= $eta ? 'À ce rythme (' . money($pace, false) . '/mois) : atteint en ' . e(month_label($eta)) : 'Pas de versement ces 6 derniers mois' ?></div><?php endif; ?>
             </div>
         </a>
     </div>

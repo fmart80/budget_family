@@ -236,3 +236,26 @@ function php_security_status(?string $version = null, ?string $today = null): ?a
     }
     return null;
 }
+
+/** Réglage enregistré en base (table settings), ou valeur par défaut. */
+function setting(string $name, mixed $default = null): mixed
+{
+    static $cache = null;
+    if ($cache === null) {
+        $cache = [];
+        try {
+            foreach (db()->query('SELECT name, value FROM settings') as $row) {
+                $cache[$row['name']] = $row['value'];
+            }
+        } catch (\PDOException) {
+            // Table pas encore créée (migration en attente).
+        }
+    }
+    return array_key_exists($name, $cache) && $cache[$name] !== '' ? $cache[$name] : $default;
+}
+
+function save_setting(string $name, ?string $value): void
+{
+    db()->prepare('INSERT INTO settings (name, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)')
+        ->execute([$name, $value]);
+}
