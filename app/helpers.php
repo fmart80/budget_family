@@ -203,3 +203,36 @@ function all_categories(?string $type = null): array
     }
     return db()->query('SELECT * FROM categories ORDER BY type DESC, name')->fetchAll();
 }
+
+/**
+ * Vérifie la version de PHP du serveur : faille connue non corrigée ou fin de support.
+ * À tenir à jour lors des prochaines alertes de sécurité PHP.
+ *
+ * @return array{level: string, message: string}|null
+ */
+function php_security_status(?string $version = null, ?string $today = null): ?array
+{
+    $version ??= PHP_VERSION;
+    $today ??= date('Y-m-d');
+    // Versions corrigeant PHP2Shell (CVE-2026-109618 / CVE-2026-109619), publiées le 21.10.2026.
+    $fixed = ['8.2' => '8.2.35', '8.3' => '8.3.36', '8.4' => '8.4.27', '8.5' => '8.5.12'];
+    // Fin des correctifs de sécurité de chaque branche.
+    $endOfLife = ['8.2' => '2026-12-31', '8.3' => '2027-12-31', '8.4' => '2028-12-31', '8.5' => '2029-12-31'];
+
+    $branch = implode('.', array_slice(explode('.', $version), 0, 2));
+    if (!isset($fixed[$branch]) || $today > $endOfLife[$branch]) {
+        return ['level' => 'danger', 'message' => "PHP $version ne reçoit plus de correctifs de sécurité. "
+            . 'Choisissez une version récente (8.4 ou plus) dans Plesk → Paramètres PHP.'];
+    }
+    if (version_compare($version, $fixed[$branch], '<')) {
+        return ['level' => 'danger', 'message' => "PHP $version est vulnérable à la faille critique PHP2Shell "
+            . "(CVE-2026-109618 / CVE-2026-109619). Mettez à jour vers PHP {$fixed[$branch]} ou plus dans Plesk "
+            . '→ Paramètres PHP, ou demandez la mise à jour à votre hébergeur.'];
+    }
+    $daysLeft = (int) ((strtotime($endOfLife[$branch]) - strtotime($today)) / 86400);
+    if ($daysLeft <= 90) {
+        return ['level' => 'warning', 'message' => "PHP $branch ne recevra plus de correctifs de sécurité après le "
+            . date_ch($endOfLife[$branch]) . ". Prévoyez de passer à PHP 8.4 dans Plesk → Paramètres PHP."];
+    }
+    return null;
+}

@@ -61,6 +61,10 @@ $user = current_user();
 </nav>
 
 <main class="container-xl py-4">
+    <?php if (is_admin() && ($phpStatus = php_security_status())): ?>
+        <div class="alert alert-<?= e($phpStatus['level']) ?>"><i class="bi bi-shield-exclamation"></i> <strong>Sécurité du serveur :</strong> <?= e($phpStatus['message']) ?>
+            <small class="d-block text-muted">Message visible uniquement par les administrateurs.</small></div>
+    <?php endif; ?>
     <?php foreach (take_flashes() as $f): ?>
         <div class="alert alert-<?= e($f['type']) ?> alert-dismissible fade show" role="alert">
             <?= e($f['message']) ?>
