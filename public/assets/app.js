@@ -43,3 +43,26 @@ document.querySelectorAll('[data-months]').forEach((btn) => {
         document.querySelectorAll('.month-check').forEach((cb) => { cb.checked = set.includes(cb.value); });
     });
 });
+
+// Calendrier : un clic sur un jour affiche son détail sous la grille.
+const calDetail = document.getElementById('cal-detail');
+if (calDetail) {
+    const title = document.getElementById('cal-detail-title');
+    const body = document.getElementById('cal-detail-body');
+    document.querySelectorAll('.cal-cell[data-day]').forEach((cell) => {
+        cell.addEventListener('click', () => {
+            const tpl = document.getElementById('cal-day-' + cell.dataset.day);
+            if (!tpl) return;
+            document.querySelectorAll('.cal-selected').forEach((c) => c.classList.remove('cal-selected'));
+            cell.classList.add('cal-selected');
+            title.textContent = tpl.dataset.title;
+            body.replaceChildren(tpl.content.cloneNode(true));
+            calDetail.classList.remove('d-none');
+            calDetail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+    });
+    document.getElementById('cal-detail-close').addEventListener('click', () => {
+        calDetail.classList.add('d-none');
+        document.querySelectorAll('.cal-selected').forEach((c) => c.classList.remove('cal-selected'));
+    });
+}

@@ -122,6 +122,10 @@ eq(date('Y-m', strtotime('+10 months', strtotime(date('Y-m-01')))), SavingsContr
 eq(null, SavingsController::eta(['target_amount' => 3000], 1000, 0), 'sans versement : pas de date');
 eq(date('Y-m'), SavingsController::eta(['target_amount' => 3000], 3500, 0), 'objectif déjà atteint');
 
+echo "Calendrier\n";
+eq('Jeudi 1 octobre', day_label('2026-10-01'), 'libellé du jour');
+eq('Dimanche 25 octobre', day_label('2026-10-25'), 'libellé du dimanche');
+
 echo "Sécurité PHP\n";
 eq('danger', php_security_status('8.2.34', '2026-10-22')['level'] ?? null, 'PHP 8.2.34 vulnérable (PHP2Shell)');
 eq('warning', php_security_status('8.2.35', '2026-10-22')['level'] ?? null, 'PHP 8.2.35 corrigé mais fin de support proche');

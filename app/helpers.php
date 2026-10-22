@@ -259,3 +259,12 @@ function save_setting(string $name, ?string $value): void
     db()->prepare('INSERT INTO settings (name, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)')
         ->execute([$name, $value]);
 }
+
+/** « Jeudi 1 octobre » */
+function day_label(string $date): string
+{
+    static $days = [1 => 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+    static $months = [1 => 'janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+    $ts = strtotime($date);
+    return ucfirst($days[(int) date('N', $ts)] . ' ' . (int) date('j', $ts) . ' ' . $months[(int) date('n', $ts)]);
+}
