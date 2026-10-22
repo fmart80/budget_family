@@ -83,6 +83,11 @@ $routes = [
     'forecast/plan_from_average'   => ['ForecastController', 'planFromAverage'],
 
     'guide'                => ['GuideController', 'index'],
+    'score'                => ['ScoreController', 'index'],
+    'calendar'             => ['CalendarController', 'index'],
+    'taxes'                => ['TaxesController', 'index'],
+    'taxes/save'           => ['TaxesController', 'save'],
+    'taxes/deductions'     => ['TaxesController', 'deductions'],
 
     'subscriptions'        => ['SubscriptionsController', 'index'],
     'subscriptions/edit'   => ['SubscriptionsController', 'edit'],

@@ -13,7 +13,8 @@ $totalBudget = array_sum(array_column($rows, 'budget'));
 </div>
 
 <div class="row g-3 mb-4">
-    <div class="col-md-3"><div class="card card-body"><div class="stat-label">Revenus du mois</div><div class="stat-value amount-income"><?= money($totals['income']) ?></div></div></div>
+    <div class="col-md-3"><div class="card card-body"><div class="stat-label">Revenus du mois</div><div class="stat-value amount-income"><?= money($totals['income']) ?></div>
+        <?php if ($totals['income'] > 0): ?><small class="text-muted">Taux d'épargne : <strong><?= number_format($totals['net'] / $totals['income'] * 100, 1, '.', "'") ?> %</strong></small><?php endif; ?></div></div>
     <div class="col-md-3"><div class="card card-body"><div class="stat-label">Budget prévu</div><div class="stat-value"><?= money($totalBudget) ?></div></div></div>
     <div class="col-md-3"><div class="card card-body"><div class="stat-label">Dépensé</div><div class="stat-value amount-expense"><?= money($totals['expense']) ?></div></div></div>
     <div class="col-md-3"><div class="card card-body"><div class="stat-label">Reste à dépenser</div>

@@ -5,6 +5,7 @@ namespace App\Controllers;
 
 use App\Finance;
 use App\Forecast;
+use App\Score;
 use App\Subscriptions;
 
 final class DashboardController
@@ -39,7 +40,12 @@ final class DashboardController
         $subs = Subscriptions::all('active');
         usort($subs, fn ($a, $b) => $a['next_date'] <=> $b['next_date']);
 
+        $score = Score::compute();
+        Score::recordAndHistory($score['score'], $score['criteria']);
+
         view('dashboard/index', [
+            'score'        => $score,
+            'monthRate'    => Score::monthRate($month),
             'subs'         => $subs,
             'title'        => 'Tableau de bord',
             'month'        => $month,

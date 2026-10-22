@@ -141,7 +141,7 @@ final class Forecast
             foreach (Finance::amortization($rest, (float) $d['interest_rate'], (float) $d['monthly_payment']) as $row) {
                 $schedule[$row['month']] = $row['payment'];
             }
-            $out[] = ['name' => $d['name'], 'schedule' => $schedule];
+            $out[] = ['name' => $d['name'], 'schedule' => $schedule, 'day' => (int) date('j', strtotime($d['start_date']))];
         }
         return $out;
     }

@@ -170,6 +170,17 @@ $base = $cardScenarios[0]['result'];
 </div></div>
 
 <div class="card mb-4"><div class="card-body">
+    <h2 class="h5">Score financier, impôts et calendrier</h2>
+    <ul class="mb-0">
+        <li><strong><a href="<?= url('score') ?>">Score financier</a></strong> : une note sur 100 calculée sur 9 critères (taux d'épargne, fonds d'urgence, dettes, logement, budget, factures, prévisions, 3ᵉ pilier, suivi). Elle affiche vos 3 priorités et sa progression mois après mois.</li>
+        <li><strong>Taux d'épargne</strong> : la part des revenus qui reste après les dépenses, affichée sur l'accueil et dans le budget du mois. Visez au moins 10 %, idéalement 20 %.</li>
+        <li><strong>Objectifs d'épargne</strong> : la date d'arrivée estimée au rythme de vos versements des 6 derniers mois, en rouge si vous êtes en retard sur la date visée.</li>
+        <li><strong><a href="<?= url('taxes') ?>">Impôts</a></strong> : saisissez une fois votre dernier avis de taxation (revenus nets et total des impôts). L'application calcule votre taux réel, estime les impôts de l'année, compare avec ce que vous avez prévu et chiffre l'économie possible avec le 3a. Une liste vous aide à rassembler les justificatifs des déductions.</li>
+        <li><strong><a href="<?= url('calendar') ?>">Calendrier</a></strong> : tous les prélèvements et rentrées du mois, jour par jour, avec le solde prévu. Pratique pour vérifier qu'aucune grosse facture ne tombe avant le salaire.</li>
+    </ul>
+</div></div>
+
+<div class="card mb-4"><div class="card-body">
     <h2 class="h5">Étape 4 — La routine (15 minutes par mois)</h2>
     <div class="row">
         <div class="col-md-6">

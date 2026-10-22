@@ -41,6 +41,24 @@ $budgetUsed = $budgetTotal > 0 ? min(100, $totals['expense'] / $budgetTotal * 10
     <div class="col-6 col-lg-3"><div class="card card-body h-100"><div class="stat-label">Dettes restantes</div><div class="stat-value"><?= money($debtRemaining) ?></div></div></div>
 </div>
 
+<?php [$scoreLabel, $scoreColor] = \App\Score::label($score['score']); ?>
+<div class="row g-3 mb-4">
+    <div class="col-md-6"><a href="<?= url('score') ?>" class="card card-body h-100 text-reset text-decoration-none">
+        <div class="d-flex align-items-center gap-3">
+            <div class="display-6 fw-bold text-<?= $scoreColor ?>"><?= $score['score'] ?? '—' ?><small class="fs-6 text-muted">/100</small></div>
+            <div class="flex-grow-1"><div class="stat-label">Score financier</div><span class="badge text-bg-<?= $scoreColor ?>"><?= e($scoreLabel) ?></span>
+                <?php if ($score['score'] !== null): ?><div class="progress mt-2"><div class="progress-bar bg-<?= $scoreColor ?>" style="width: <?= $score['score'] ?>%"></div></div><?php endif; ?></div>
+            <i class="bi bi-chevron-right text-muted"></i>
+        </div></a></div>
+    <div class="col-md-6"><div class="card card-body h-100">
+        <div class="stat-label">Taux d'épargne</div>
+        <div class="d-flex gap-4 align-items-baseline">
+            <div><span class="stat-value <?= ($monthRate ?? 0) < 0 ? 'amount-expense' : 'amount-income' ?>"><?= $monthRate === null ? '—' : number_format($monthRate, 1, '.', "'") . ' %' ?></span><div class="small text-muted"><?= e(month_label($month)) ?> (en cours)</div></div>
+            <div><span class="stat-value fs-5"><?= $score['savings']['rate'] === null ? '—' : number_format($score['savings']['rate'], 1, '.', "'") . ' %' ?></span><div class="small text-muted">moyenne 3 derniers mois</div></div>
+        </div>
+    </div></div>
+</div>
+
 <?php if ($forecast): ?>
 <div class="card mb-4"><div class="card-body">
     <div class="d-flex justify-content-between"><h2 class="h6">Prochains mois</h2><a href="<?= url('forecast') ?>" class="small">Prévisions complètes</a></div>

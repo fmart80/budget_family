@@ -17,9 +17,12 @@ Application web en PHP pour gérer le budget d'une famille : comptes, transactio
 | **Lissage** | Montant à mettre de côté chaque mois pour les dépenses irrégulières, marge mensuelle réelle, plan de compte « réserve factures » |
 | **Analyse** | Dépenses moyennes par catégorie sur 3, 6 et 12 mois, comparées au plan et au mois en cours |
 | **Factures** | Échéances, retards, pièces jointes (PDF/JPG/PNG), factures récurrentes (mensuelle → annuelle) recréées automatiquement au paiement |
+| **Score financier** | Note sur 100 (9 critères : épargne, fonds d'urgence, dettes, logement, budget, factures, prévisions, 3ᵉ pilier, suivi), priorités et historique ; taux d'épargne sur l'accueil et le budget |
+| **Impôts** | Estimation à partir du dernier avis de taxation (taux réel), écart avec le plan, économie possible avec le 3a, liste des déductions à rassembler |
+| **Calendrier** | Prélèvements et rentrées du mois jour par jour (factures, abonnements, postes prévus, dettes) avec solde prévu |
 | **Abonnements** | Netflix, Spotify, téléphone… : coût par mois et par an, part sur la carte de crédit, prochains prélèvements, détection automatique dans les relevés, alertes de hausse de prix, économies réalisées grâce aux résiliations |
 | **Dettes** | Solde restant, échéancier avec intérêts, date de fin estimée, stratégies avalanche et boule de neige, simulateur (mensualité, versements extra avec le 13ᵉ, « finir en N mois ») |
-| **Épargne** | Objectifs (fonds d'urgence, vacances, 3ᵉ pilier…), progression, montant à épargner par mois, virement automatique vers le compte épargne |
+| **Épargne** | Objectifs (fonds d'urgence, vacances, 3ᵉ pilier…), progression, montant à épargner par mois, date d'arrivée estimée au rythme actuel, virement automatique vers le compte épargne |
 | **Utilisateurs** | Plusieurs membres de la famille (rôles administrateur et membre), mots de passe chiffrés, blocage après 5 tentatives échouées |
 
 Les montants s'affichent au format suisse (`CHF 1'234.50`) et les dates au format `31.12.2026`.

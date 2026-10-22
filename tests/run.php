@@ -13,6 +13,8 @@ spl_autoload_register(function (string $class): void {
 require APP_PATH . '/helpers.php';
 
 use App\Controllers\BillsController;
+use App\Controllers\SavingsController;
+use App\Controllers\TaxesController;
 use App\Finance;
 use App\Forecast;
 use App\Import\CamtImporter;
@@ -107,6 +109,18 @@ eq([2, 5, 8, 11], Subscriptions::monthList('2026-11-20', 'quarterly'), 'mois tri
 eq('netflix', Subscriptions::merchantKey('NETFLIX.COM 1001 AMSTERDAM'), 'service connu');
 eq('spotify', Subscriptions::merchantKey('Spotify P3000 Stockholm'), 'service connu avec référence');
 eq('ecole musique', Subscriptions::merchantKey('LSV Ecole de Musique Bulle 4512'), 'libellé générique');
+
+echo "Impôts\n";
+$t = TaxesController::estimate(100000, 12000, 105000, 9000);
+eq(12.0, round($t['rate'], 2), 'taux réel = impôts / revenus');
+eq(12600.0, $t['estimate'], 'estimation = taux × revenus attendus');
+eq(300.0, $t['monthly_gap'], 'manque mensuel à prévoir');
+eq(null, TaxesController::estimate(0, 12000, 105000, 0), 'sans avis de taxation');
+
+echo "Objectifs d'épargne\n";
+eq(date('Y-m', strtotime('+10 months', strtotime(date('Y-m-01')))), SavingsController::eta(['target_amount' => 3000], 1000, 200), 'date d\'arrivée au rythme actuel');
+eq(null, SavingsController::eta(['target_amount' => 3000], 1000, 0), 'sans versement : pas de date');
+eq(date('Y-m'), SavingsController::eta(['target_amount' => 3000], 3500, 0), 'objectif déjà atteint');
 
 echo "Sécurité PHP\n";
 eq('danger', php_security_status('8.2.34', '2026-10-22')['level'] ?? null, 'PHP 8.2.34 vulnérable (PHP2Shell)');
